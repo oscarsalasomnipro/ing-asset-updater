@@ -1,0 +1,30 @@
+{
+  "aem": {
+    "enviromentURL": "https://author-p146602-e1506206.adobeaemcloud.com",
+    "username": "aem_assets_integration_dev",
+    "password": "tempo123"
+  },
+  "local": {
+    "assetsFile": {
+      "path": "C:\\Users\\odgar\\Downloads\\aec-aem-asset-uploader-updater\\src\\csv\\assetsFile.csv",
+      "metadataMapping": [
+        {
+          "columnInAssetsFile": "Title",
+          "metadataFieldInAEM": "ing:title",
+          "isMetadata": true,
+          "isStringArray": false
+        },
+        {
+          "columnInAssetsFile": "Tags",
+          "metadataFieldInAEM": "ing:keywords",
+          "isMetadata": false,
+          "isStringArray": true
+        }
+      ]
+    },
+    "assetsFolderScanning": {
+      "enabled": true,
+      "path": "C:\\Users\\odgar\\Pictures\\Camera Roll"
+    }
+  }
+}
