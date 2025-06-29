@@ -1,5 +1,5 @@
 {
-  "name": "aec-aem-asset-uploader",
+  "name": "ing-aec-aem-asset-uploader",
   "version": "1.0.0",
   "description": "",
   "main": "./src/uploader-preparator.js",

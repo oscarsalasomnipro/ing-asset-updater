@@ -6,7 +6,6 @@
   },
   "local": {
     "assetsFile": {
-      "path": "C:\\Users\\odgar\\Downloads\\aec-aem-asset-uploader-updater\\src\\csv\\assetsFile.csv",
       "metadataMapping": [
         {
           "columnInAssetsFile": "Title",
@@ -20,7 +19,8 @@
           "isMetadata": false,
           "isStringArray": true
         }
-      ]
+      ],
+      "path": "C:\\Users\\odgar\\Documents\\GitHub\\ing-aec-aem-asset-uploader-updater\\src\\csv\\assetsFile.csv"
     },
     "assetsFolderScanning": {
       "enabled": true,
