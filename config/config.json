@@ -10,13 +10,13 @@
         {
           "columnInAssetsFile": "Title",
           "metadataFieldInAEM": "ing:title",
-          "isMetadata": true,
+          "isMetadata": false,
           "isStringArray": false
         },
         {
           "columnInAssetsFile": "Tags",
           "metadataFieldInAEM": "ing:keywords",
-          "isMetadata": false,
+          "isMetadata": true,
           "isStringArray": true
         }
       ],

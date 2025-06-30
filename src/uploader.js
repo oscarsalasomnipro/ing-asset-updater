@@ -108,6 +108,14 @@ async function main() {
 
             let assetsBatchToUpload = assetsToUpload.filter(assetToUpload => assetToUpload._assetFolderPathInAEM === assetsToUploadAvailableFolders[i])
 
+            if (assetsBatchToUpload.length === 0) {
+
+                console.log("No se detectaron assets para cargar a la carpeta", assetsToUploadAvailableFolders[i] + ". Por favor verifique el contenido del archivo e intente nuevamente")
+
+                continue
+
+            }
+
             assetsBatchToUpload = assetsBatchToUpload.map(assetToUpload => {
                 return {
                     'fileName': assetToUpload._assetFileNameInAEM,
@@ -130,19 +138,19 @@ async function main() {
                     assetsUploadResults?.detailedResult
                 )
 
-                if(patchedUploadedAssets){
+                if (patchedUploadedAssets) {
 
                     console.log("El archivo de assets se ha actualizado. Por favor verifique el contenido del archivo")
 
-                }else{
+                } else {
 
-                    console.log("El archivo de assets no se pudo actualizar")
+                    console.error("El archivo de assets no se pudo actualizar")
 
                 }
 
-            }else{
+            } else {
 
-                console.log("No se detectaron assets cargados")
+                console.error("No se detectaron assets cargados")
 
             }
 
