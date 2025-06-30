@@ -13,7 +13,7 @@ function normalizeAssetName(assetName) {
 
         assetName = assetName.replace(/^\/+|\/+$/g, '');
 
-        assetName = assetName.replace(/[\/\\\*\?"|\:<>\[\]% ]/g, '');
+        assetName = assetName.replace(/[\/\\\*\?"|\:<>\[\]%]/g, '');
 
         assetName = assetName.replace(/\/{2,}/g, '/');
 
@@ -168,12 +168,10 @@ async function getAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFol
 
 
 async function postAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFolder) {
-    
+
     try {
 
         let results
-
-        aemFolder = aemFolder.trim();
 
         const aemFolderFragments = aemFolder.split('/');
 
@@ -182,7 +180,7 @@ async function postAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFo
             const config = {
                 method: 'post',
                 maxBodyLength: Infinity,
-                url: encodeURI(aemEnviromentURL + "/api/assets/" + currentFolderPath),
+                url: encodeURI(aemEnviromentURL + "/api/assets/" + aemFolderFragments.slice(0, i + 1).join('/')),
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -191,7 +189,7 @@ async function postAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFo
                 data: JSON.stringify({
                     'class': 'assetFolder',
                     'properties': {
-                        'jcr:title': currentFolderName
+                        'jcr:title': aemFolderFragments[aemFolderFragments.length - 1]
                     }
                 }),
                 validateStatus: () => true

@@ -13,6 +13,7 @@
     "axios": "^1.10.0",
     "data-forge": "^1.10.4",
     "data-forge-fs": "^0.0.9",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "underscore": "^1.13.7"
   }
 }
