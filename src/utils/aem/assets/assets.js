@@ -9,8 +9,6 @@ function normalizeAssetName(assetName) {
             return '_NotAssetName';
         }
 
-        assetName = assetName.trim();
-
         assetName = assetName.replace(/^\/+|\/+$/g, '');
 
         assetName = assetName.replace(/[\/\\\*\?"|\:<>\[\]%]/g, '');
@@ -18,6 +16,8 @@ function normalizeAssetName(assetName) {
         assetName = assetName.replace(/\/{2,}/g, '/');
 
         assetName = assetName.replace(/\.+$/, '');
+
+        assetName = assetName.trim();
 
         if (assetName === '') {
             return '_NotAssetName';
@@ -152,15 +152,15 @@ function normalizeAssetFolderName(assetFolderName) {
             return '';
         }
 
-        assetFolderName = assetFolderName.trim();
-
         assetFolderName = assetFolderName.replace(/^\/+|\/+$/g, '');
 
-        assetFolderName = assetFolderName.replace(/[\\\*\?"|\:<>\[\]% ]/g, '');
+        assetFolderName = assetFolderName.replace(/[\\\*\?"|\:<>\[\]%]/g, '');
 
         assetFolderName = assetFolderName.replace(/\/{2,}/g, '/');
 
         assetFolderName = assetFolderName.replace(/\.+$/, '');
+
+        assetFolderName = assetFolderName.trim();
 
         return assetFolderName
 

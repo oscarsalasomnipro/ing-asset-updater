@@ -16,15 +16,21 @@
         {
           "columnInAssetsFile": "Tags",
           "metadataFieldInAEM": "dc:subject",
-          "isMetadata": true,
+          "isMetadata": false,
           "isStringArray": true
+        },
+        {
+          "columnInAssetsFile": "Description",
+          "metadataFieldInAEM": "dc:description",
+          "isMetadata": false,
+          "isStringArray": false
         }
       ],
-      "path": "C:\\Users\\odgar\\Documents\\GitHub\\ing-aec-aem-asset-uploader-updater\\src\\csv\\assetsFile.csv"
+      "path": "C:\\Users\\Edgar Herrera\\Documents\\GitHub\\ing-aec-aem-asset-uploader-updater\\src\\csv\\assetsFile.csv"
     },
     "assetsFolderScanning": {
       "enabled": true,
-      "path": "C:\\Users\\odgar\\Pictures\\Imagenes de prueba"
+      "path": "C:\\Users\\Edgar Herrera\\Downloads\\Assets"
     }
   }
 }
