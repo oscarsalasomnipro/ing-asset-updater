@@ -7,6 +7,7 @@ const folder = require('../../utils/folder/folder.js')
 const file = require('../../utils/file/file.js')
 const aemAssets = require('../../utils/aem/assets/assets.js')
 const underscore = require('underscore')
+const { json } = require('stream/consumers')
 
 function getAssetsToUpload(assetsFilePath, { enableAssetsFolderScanning = false, assetsScanningFolderPath = '' }) {
 
@@ -203,6 +204,25 @@ function patchUploadedAssets(assetsFilePath, uploadedAssets) {
 
         }
 
+        if (uploadedAssets.every(uploadedAsset =>
+            typeof uploadedAsset.filePath === 'string' &&
+            typeof uploadedAsset?.result?.targetFile === 'string'
+        )) {
+            if (uploadedAssets.some(uploadedAsset =>
+                uploadedAsset.filePath.trim() === '' ||
+                uploadedAsset?.result?.targetFile.trim() === ''
+            )) {
+                console.error("El mapeo de campos de los assets, almacenados en las rutas local.assetsFile.metadataMapping[*].columnInAssetsFile y local.assetsFile.metadataMapping[*].metadataFieldInAEM en el archivo de configuración, están vacíos. Por favor verifique el mapeo e intente nuevamente")
+                return patchedUploadedAssets
+            }
+        } else {
+
+            console.error("La información de los assets cargados no contiene la ruta de los assets. Por favor verifique los resultados de la carga e intente nuevamente")
+
+            return patchedUploadedAssets
+
+        }
+
         let assetsFile = dataForge.readFileSync(assetsFilePath).parseCSV()
 
         assetsFile = assetsFile.bake()
@@ -303,7 +323,7 @@ function patchUploadedAssets(assetsFilePath, uploadedAssets) {
 
 }
 
-function getAssetsToUpdate(assetsFilePath, metadataMapping) {
+async function getAssetsToUpdate(assetsFilePath, metadataMapping, { aemUsername, aemPassword, aemEnviromentURL }) {
 
     let assetsToUpdate = []
 
@@ -328,6 +348,45 @@ function getAssetsToUpdate(assetsFilePath, metadataMapping) {
             return assetsToUpdate
 
         }
+
+        assetsFile = assetsFile.select(row => {
+            return {
+                ...row,
+                _assetFilePathInAEM: row._assetFilePathInAEM.trim()
+            }
+        })
+
+        assetsFile = assetsFile.bake()
+
+        assetsFile = assetsFile.distinct(row => row._assetFilePathInAEM)
+
+        assetsFile = assetsFile.bake()
+
+        assetsFile = assetsFile.toArray()
+
+        assetsFileFilteredRows = []
+
+        for (let i = 0; i < assetsFile.length; i++) {
+
+            let results = await aemAssets.getAsset(aemUsername, aemPassword, aemEnviromentURL, assetsFile[i]._assetFilePathInAEM)
+
+            if (results.status === 200) {
+
+                assetsFileFilteredRows.push(assetsFile[i])
+
+                console.log("El asset", assetsFile[i]._assetFilePathInAEM, "existe y puede ser actualizado")
+
+            } else {
+
+                console.log("El asset", assetsFile[i]._assetFilePathInAEM, "no existe y no se tendrá en cuenta")
+
+            }
+
+        }
+
+        assetsFile = new dataForge.DataFrame(assetsFileFilteredRows)
+
+        assetsFile = assetsFile.bake()
 
         if (!Array.isArray(metadataMapping)) {
             console.error("El mapeo de campos de los assets, almacenado en la ruta local.assetsFile.metadataMapping en el archivo de configuración, no es valido. Por favor verifique el mapeo e intente nuevamente")
@@ -378,7 +437,12 @@ function getAssetsToUpdate(assetsFilePath, metadataMapping) {
             }
 
             let assetMetadataToUpdate = {
-                _assetFilePathInAEM: assetsFile.at(i)._assetFilePathInAEM
+                _assetFilePathInAEM: assetsFile.at(i)._assetFilePathInAEM,
+                data: {
+                    metadata: {
+                        'dam:status': 'approved'
+                    }
+                }
             }
 
             for (let j = 0; j < metadataMapping.length; j++) {
@@ -424,9 +488,126 @@ function getAssetsToUpdate(assetsFilePath, metadataMapping) {
 
 }
 
+function patchUpdatedAssets(assetsFilePath, updatedAssets) {
+
+    let patchedUpdatedAssets = false
+
+    try {
+
+        if (!csv.isCSVFilePath(assetsFilePath)) {
+
+            console.error("La ruta del archivo de assets, almacenada en la ruta local.assetsFile.path en el archivo de configuración, no es valida. Por favor verifique la ruta e intente nuevamente")
+
+            return patchedUpdatedAssets
+
+        }
+
+        if(!Array.isArray(updatedAssets)){
+
+            console.error("La información de los assets actualizados no está en formato Array. Por favor verifique los resultados de la actulización e intente nuevamente")
+
+            return patchedUpdatedAssets
+
+        }
+
+        if (updatedAssets.every(updatedAsset =>
+            typeof updatedAsset._assetFilePathInAEM === 'string'
+        )) {
+            if (updatedAssets.some(updatedAsset =>
+                updatedAsset._assetFilePathInAEM.trim() === ''
+            )) {
+                console.error("La información de los assets actualizados no contiene la ruta de los assets. Por favor verifique los resultados de la carga e intente nuevamente")
+                return patchedUpdatedAssets
+            }
+        } else {
+
+            console.error("La información de los assets actualizados no contiene la ruta de los assets. Por favor verifique los resultados de la carga e intente nuevamente")
+
+            return patchedUpdatedAssets
+
+        }
+
+        let assetsFile = dataForge.readFileSync(assetsFilePath).parseCSV()
+
+        assetsFile = assetsFile.bake()
+
+        if (!assetsFile.hasSeries('_assetFilePathInAEM')) {
+
+            console.error("La columna _assetFilePathInAEM no se encuentra en el archivo de assets. Por favor verifique el contenido del archivo e intente nuevamente")
+
+            return patchedUpdatedAssets;
+
+        } else if (!assetsFile.hasSeries('_isAssetUploaded')) {
+
+            console.error("La columna _isAssetUploaded no se encuentra en el archivo de assets. Por favor verifique el contenido del archivo e intente nuevamente")
+
+            return patchedUpdatedAssets;
+
+        } else if (!assetsFile.hasSeries('_assetUploadedAt')) {
+
+            console.error("La columna _assetUploadedAt no se encuentra en el archivo de assets. Por favor verifique el contenido del archivo e intente nuevamente")
+
+            return patchedUpdatedAssets;
+
+        }
+
+        assetsFile = assetsFile.select(row => {
+            return {
+                ...row,
+                _assetFilePathInAEM: row._assetFilePathInAEM.trim()
+            }
+        })
+
+        assetsFile = assetsFile.bake()
+
+        assetsFile = assetsFile.distinct(row => row._assetFilePathInAEM)
+
+        assetsFile = assetsFile.bake()
+
+        updatedAssets.forEach(updatedAsset => {
+
+            assetsFile = assetsFile.select(row => {
+                if (updatedAsset._assetFilePathInAEM === row._assetFilePathInAEM) {
+                    return {
+                        ...row,
+                        _isAssetUpdated: 'true',
+                        _assetUpdatedAt: new Date().toISOString()
+                    }
+                } else {
+                    return {
+                        ...row
+                    }
+                }
+            })
+
+            assetsFile = assetsFile.bake()
+
+        })
+
+        assetsFile = assetsFile.subset(assetsFile.getColumnNames().sort())
+
+        assetsFile = assetsFile.bake()
+
+        assetsFile.asCSV({ delimiter: ';' }).writeFileSync(assetsFilePath)
+
+        patchedUpdatedAssets = true
+
+        return patchedUpdatedAssets
+
+    } catch (error) {
+
+        console.error(error)
+
+        return patchedUpdatedAssets
+
+    }
+
+}
+
 module.exports = {
     getAssetsToUpload,
     getAssetsToUploadFolders,
     patchUploadedAssets,
-    getAssetsToUpdate
+    getAssetsToUpdate,
+    patchUpdatedAssets
 }

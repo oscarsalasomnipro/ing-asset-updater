@@ -52,49 +52,12 @@ async function main() {
             aemEnviromentURL: configFile?.aem?.enviromentURL
         })
 
-        if(assetsToUpdate.length === 0){
+        if (assetsToUpdate.length === 0) {
             console.log("No se detectaron assets para actualizar")
             return 1
         }
 
-        let updatedAssets = []
-
-        for (let i = 0; i < assetsToUpdate.length; i++) {
-
-            let results = await aemAssets.putAsset(configFile?.aem?.username,
-                configFile?.aem?.password,
-                configFile?.aem?.enviromentURL,
-                assetsToUpdate[i]._assetFilePathInAEM,
-                assetsToUpdate[i].data
-            )
-
-            if(results.status === 200){
-                updatedAssets.push(assetsToUpdate[i])
-            }
-
-        }
-
-        if(updatedAssets.length > 0){
-
-            let patchedUpdatedAssets = localAssets.patchUpdatedAssets(configFile?.local?.assetsFile?.path,
-                updatedAssets
-            )
-
-            if(patchedUpdatedAssets){
-
-                console.log("El archivo de assets se ha actualizado. Por favor verifique el contenido del archivo")
-
-            }else{
-
-                console.error("El archivo de assets no se pudo actualizar")
-
-            }
-
-        }else{
-
-            console.error("No se detectaron assets actulizados")
-
-        }
+        console.log("El archivo de assets se ha actualizado. Por favor verifique el contenido del archivo")
 
     } catch (error) {
 

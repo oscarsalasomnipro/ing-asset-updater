@@ -9,13 +9,13 @@
       "metadataMapping": [
         {
           "columnInAssetsFile": "Title",
-          "metadataFieldInAEM": "ing:title",
+          "metadataFieldInAEM": "dc:title",
           "isMetadata": false,
           "isStringArray": false
         },
         {
           "columnInAssetsFile": "Tags",
-          "metadataFieldInAEM": "ing:keywords",
+          "metadataFieldInAEM": "dc:subject",
           "isMetadata": true,
           "isStringArray": true
         }

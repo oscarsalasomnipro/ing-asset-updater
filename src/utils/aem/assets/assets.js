@@ -100,6 +100,50 @@ async function postAssets(aemUsername, aemPassword, aemEnviromentURL, aemFolder,
 
 }
 
+async function putAsset(aemUsername, aemPassword, aemEnviromentURL, aemAsset, aemAssetDataToUpdate) {
+
+    let results
+
+    try {
+
+        let data = JSON.stringify({
+            'class': 'asset',
+            'properties': aemAssetDataToUpdate
+        })
+
+        let config = {
+            'method': 'put',
+            'maxBodyLength': Infinity,
+            'url': encodeURI(aemEnviromentURL + '/api/assets/' + aemAsset),
+            'headers': {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Basic ' + Buffer.from(aemUsername + ':' + aemPassword, 'utf-8').toString('base64')
+            },
+            'data': data,
+            'validateStatus': () => true
+        }
+
+        results = await axios.request(config)
+
+        return results
+
+    } catch (error) {
+
+        if (error.response.status) {
+
+            return error.response
+
+        } else {
+
+            throw error
+
+        }
+
+    }
+
+}
+
 function normalizeAssetFolderName(assetFolderName) {
 
     try {
@@ -166,7 +210,6 @@ async function getAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFol
 
 }
 
-
 async function postAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFolder) {
 
     try {
@@ -221,8 +264,8 @@ module.exports = {
     normalizeAssetName,
     getAsset,
     postAssets,
+    putAsset,
     normalizeAssetFolderName,
     getAssetFolder,
-    postAssetFolder,
-    postAssets
+    postAssetFolder
 }
