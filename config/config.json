@@ -1,8 +1,8 @@
 {
   "aem": {
-    "enviromentURL": "https://author-p146602-e1506206.adobeaemcloud.com",
-    "username": "aem_assets_integration_dev",
-    "password": "tempo123"
+    "enviromentURL": "https://author-p146602-e1509556.adobeaemcloud.com",
+    "username": "aem_assets_integration_stage",
+    "password": "L8TT*X9SI6**"
   },
   "local": {
     "assetsFile": {
@@ -26,7 +26,7 @@
           "isStringArray": false
         }
       ],
-      "path": "C:\\Users\\Edgar Herrera\\Documents\\GitHub\\ing-aec-aem-asset-uploader-updater\\src\\csv\\assetsFile.csv"
+      "path": "C:\\Users\\Edgar Herrera\\Documents\\GitHub\\ing-aec-aem-asset-uploader-updater\\src\\csv\\PackDef.csv"
     },
     "assetsFolderScanning": {
       "enabled": true,
