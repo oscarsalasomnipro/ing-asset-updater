@@ -1,8 +1,8 @@
 {
   "aem": {
-    "enviromentURL": "https://author-p146602-e1509556.adobeaemcloud.com",
-    "username": "aem_assets_integration_stage",
-    "password": "L8TT*X9SI6**"
+    "enviromentURL": "https://author-p146602-e1509462.adobeaemcloud.com",
+    "username": "aem_assets_integration_production",
+    "password": "n5gX*e15Wu"
   },
   "local": {
     "assetsFile": {
@@ -26,11 +26,11 @@
           "isStringArray": false
         }
       ],
-      "path": "C:\\Users\\Edgar Herrera\\Documents\\GitHub\\ing-aec-aem-asset-uploader-updater\\src\\csv\\MigracionDefinitiva.csv"
+      "path": "C:\\Users\\Juan Torres\\OneDrive - OMNI.PRO\\Documents\\ing-aec-aem-asset-uploader-updater\\src\\csv\\migraprod2.csv"
     },
     "assetsFolderScanning": {
-      "enabled": true,
-      "path": "C:\\Users\\Edgar Herrera\\Downloads\\Assets"
+      "enabled": false,
+      "path": "C:\\Users\\Juan Torres\\Downloads\\Assets"
     }
   }
 }

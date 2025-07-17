@@ -211,54 +211,66 @@ async function getAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFol
 }
 
 async function postAssetFolder(aemUsername, aemPassword, aemEnviromentURL, aemFolder) {
+    const folderFragments = aemFolder.split('/').filter(Boolean);
+    let currentPath = '';
 
-    try {
+    for (let i = 0; i < folderFragments.length; i++) {
+        const folderName = folderFragments[i];
+        currentPath += (i === 0 ? '' : '/') + folderName;
 
-        let results
+        const fullUrl = encodeURI(`${aemEnviromentURL}/api/assets/${currentPath}`);
 
-        const aemFolderFragments = aemFolder.split('/');
+        // Verifica si ya existe
+        try {
+            const getResponse = await axios.get(fullUrl, {
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(`${aemUsername}:${aemPassword}`).toString('base64')
+                },
+                validateStatus: () => true
+            });
 
-        for (let i = 0; i < aemFolderFragments.length; i++) {
+            if (getResponse.status === 200) {
+                console.log('Carpeta ya existe: ${currentPath}');
+                continue; // Ya existe, no crearla de nuevo
+            }
+        } catch (err) {
+            console.error('Error al verificar existencia de ${currentPath}:', err.message);
+            return { status: 500, data: err.message };
+        }
 
-            const config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: encodeURI(aemEnviromentURL + "/api/assets/" + aemFolderFragments.slice(0, i + 1).join('/')),
+        // Crear solo si no existe
+        try {
+            const postResponse = await axios.post(fullUrl, {
+                class: 'assetFolder',
+                properties: {
+                    'jcr:title': folderName // Solo manda title al crear nueva
+                }
+            }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': 'Basic ' + Buffer.from(aemUsername + ":" + aemPassword, 'utf-8').toString('base64')
+                    'Authorization': 'Basic ' + Buffer.from(`${aemUsername}:${aemPassword}`).toString('base64')
                 },
-                data: JSON.stringify({
-                    'class': 'assetFolder',
-                    'properties': {
-                        'jcr:title': aemFolderFragments[aemFolderFragments.length - 1]
-                    }
-                }),
                 validateStatus: () => true
-            };
+            });
 
-            results = await axios.request(config)
-
+            if (postResponse.status === 201) {
+                console.log('Carpeta creada: ${currentPath}');
+            } else if (postResponse.status === 409) {
+                console.log('Carpeta ya existente detectada: ${currentPath}');
+            } else {
+                console.warn('Error al crear ${currentPath}: ${postResponse.status}');
+                return postResponse;
+            }
+        } catch (err) {
+            console.error('Error al crear carpeta ${currentPath}:', err.message);
+            return { status: 500, data: err.message };
         }
-
-        return results;
-
-    } catch (error) {
-
-        if (error.response.status) {
-
-            return error.response;
-
-        } else {
-
-            throw error;
-
-        }
-
     }
 
+    return { status: 201 };
 }
+
 
 module.exports = {
     normalizeAssetName,
